@@ -354,6 +354,18 @@ public int Menu_MixHandler(Menu menu, MenuAction action, int param1, int param2)
                     if (pickCount == 4) {
                         // Do not switch picks 
 
+                    } else if (pickCount == 5 && menu.GetItemCount() == 2) {
+                        // The 5th player has been picked, there should only be 1 player left.
+                        // Get that last player.
+                        menu.GetItem((param2 +1)% 2, authId, MAX_STR_LEN);
+                        // Swap the last player over to the opposing team.
+                        if(SwapPlayerToTeam(authId, GetOpposingTeam(team), 0)) { 
+                            PrintToChatAll("\x04Mix Manager: \x01 Teams are picked.");
+                            StopMix();
+                        } else {
+                            PrintToChatAll("\x04Mix Manager: \x01Unable to place the last player on a team, aborting...", param1);
+                            StopMix();
+                        }
                     } else if (pickCount > 5) {
                         PrintToChatAll("\x04Mix Manager: \x01 Teams are picked.");
                         StopMix();
@@ -370,6 +382,8 @@ public int Menu_MixHandler(Menu menu, MenuAction action, int param1, int param2)
 
     return 0;
 }
+
+stock bool PickPlayerForTeam
 
 public Action Menu_StateHandler(Handle timer, Handle hndl)
 {
@@ -604,6 +618,19 @@ stock bool:IsInfected(client)
 {                                                                               
     return IsHuman(client)
         && GetClientTeam(client) == 3; 
+}
+
+stock L4D2Team GetOpposingTeam(L4D2Team team)
+{
+    if(team == L4D2Team_Survivor)
+    {
+        return L4D2Team_Infected;
+    }
+    if(team == L4D2Team_Infected)
+    {
+        return L4D2Team_Survivor;
+    }
+    return L4D2Team_None;
 }
 
 public bool IsHuman(client)
